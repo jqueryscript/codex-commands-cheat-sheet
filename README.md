@@ -260,23 +260,6 @@ Reduce context during a long TUI session:
 /status
 ```
 
-## Experimental, Legacy, and Version-Dependent Items
-
-| Item | Status | Notes |
-|---|---|---|
-| `codex cloud` | Experimental | Requires Codex Cloud access. |
-| `codex app-server` | Experimental | Local development and debugging command. |
-| `codex mcp-server` | Experimental | Runs Codex as an MCP server. |
-| `codex sandbox` | Experimental | OS-specific sandbox helpers. |
-| `codex execpolicy` | Preview | Tests execpolicy rules. |
-| `codex plugin marketplace` | Experimental | Manages plugin marketplace sources. |
-| `/apps`, `/plugins` | Feature-dependent | Availability depends on installed connectors or plugins. |
-| `/approvals` | Legacy alias | Prefer `/permissions`. |
-| `/clean` | Legacy alias | Prefer `/stop`. |
-| `--full-auto` | Compatibility/deprecated depending on docs/version | Prefer explicit `--sandbox` and approval flags. |
-| `--experimental-json` | Alias | Prefer `--json`. |
-| `codex --upgrade` | Older help content | Current docs use `codex update`. |
-
 ## Related Resources
 
 - [Codex CLI reference](https://developers.openai.com/codex/cli/reference)
