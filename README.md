@@ -69,10 +69,23 @@ codex resume --last
 | `codex "Explain this codebase"` | Starts the TUI with an initial prompt. | Useful for analysis sessions. |
 | `codex resume` | Opens a picker for saved sessions. | Scoped to the current directory by default. |
 | `codex resume --last` | Resumes the most recent session. | Add `--all` to ignore directory scope. |
+| `codex resume --include-non-interactive` | Includes non-interactive sessions in the picker and `--last` selection. | Stable in current local CLI help. |
 | `codex resume <SESSION_ID>` | Resumes a specific session. | Session IDs appear in status and session files. |
 | `codex fork` | Forks a previous session. | Useful when trying a different approach. |
 | `codex fork --last` | Forks the latest session. | Keeps the original session intact. |
 | `codex exec resume --last "Continue the fix"` | Resumes a non-interactive session with a follow-up prompt. | Useful for automation. |
+
+## Project and Workspace Commands
+
+| Command | What it does | Notes |
+|---|---|---|
+| `codex --cd <path>` | Starts Codex in a specific working directory. | Also available as `-C`. |
+| `codex --add-dir <path>` | Grants access to another directory. | Repeatable. Prefer this over disabling the sandbox. |
+| `codex --image screenshot.png "Fix this UI"` | Attaches an image to the initial prompt. | Also available as `-i`. |
+| `codex completion zsh` | Prints shell completions. | Supports `bash`, `zsh`, `fish`, `powershell`, and `elvish`. |
+| `codex app` | Opens Codex Desktop from the terminal. | Listed in current official docs; local CLI behavior may vary by install. |
+| `codex app <PATH>` | Opens a workspace path in Codex Desktop. | Listed in current official docs. |
+| `codex app --download-url` | Prints the Codex Desktop download URL. | Listed in current official docs. |
 
 ## Interactive Slash Commands
 
@@ -92,6 +105,11 @@ Slash commands work inside the interactive Codex TUI. They are not shell command
 | `/mention <path>` | Adds a file or folder to the conversation. | Helps focus Codex on specific code. |
 | `/init` | Generates an `AGENTS.md` scaffold. | Review before committing. |
 | `/mcp` | Lists available MCP tools. | Add `verbose` for more detail. |
+| `/agent` | Creates, switches, lists, or manages delegated agents when available. | Feature-dependent. |
+| `/ps` | Lists background terminals or tasks when available. | Feature-dependent. |
+| `/stop` | Stops running tasks when available. | Feature-dependent. |
+| `/logout` | Signs out of Codex from inside the TUI. | TUI-only. |
+| `/feedback` | Opens feedback flow from inside the TUI. | TUI-only. |
 | `/exit` | Exits Codex. | Alias of `/quit`. |
 
 ## Code Editing and Review
@@ -99,10 +117,12 @@ Slash commands work inside the interactive Codex TUI. They are not shell command
 | Command | What it does | Notes |
 |---|---|---|
 | `codex exec "Run tests and fix failures"` | Runs Codex non-interactively until the task finishes. | Good for scripted repair tasks. |
+| `codex exec review` | Runs a review through the `codex exec` command tree. | Stable in current local CLI help. |
 | `codex review` | Runs a non-interactive code review. | Stable in current local CLI help. |
 | `codex review --uncommitted` | Reviews staged, unstaged, and untracked changes. | Useful before committing. |
 | `codex review --base main` | Reviews changes against a base branch. | Useful for PR review. |
 | `codex review --commit <SHA>` | Reviews one commit. | Useful for release or regression checks. |
+| `codex review --title "Title"` | Sets an optional title in the review summary. | Stable in current local CLI help. |
 | `codex exec --output-last-message result.md "Summarize the patch"` | Writes the final response to a file. | Good for CI output. |
 | `codex exec --output-schema schema.json "Return JSON"` | Validates final output against a JSON Schema. | Use for structured automation. |
 | `codex apply <TASK_ID>` | Applies the latest diff from a Codex Cloud task. | Requires task access. Alias: `codex a`. |
@@ -163,6 +183,7 @@ network_access = false
 | `codex mcp add <name> -- <command...>` | Adds a stdio MCP server. | Command after `--` starts the server. |
 | `codex mcp add <name> --url https://...` | Adds a streamable HTTP MCP server. | Use token env vars for secrets. |
 | `codex mcp login <name>` | Starts OAuth login for an HTTP MCP server. | Server must support OAuth. |
+| `codex mcp login <name> --scopes scope1,scope2` | Requests specific OAuth scopes. | Experimental MCP flow. |
 | `codex mcp logout <name>` | Removes stored OAuth credentials. | HTTP MCP servers only. |
 | `codex mcp remove <name>` | Removes an MCP server definition. | Does not remove external server code. |
 | `codex mcp-server` | Runs Codex as an MCP server over stdio. | Experimental. |
@@ -191,6 +212,7 @@ codex mcp list
 | `--json` | Prints JSONL events in `codex exec`. | Automation-friendly. |
 | `--output-last-message <file>` | Writes the final message to a file. | `codex exec` only. |
 | `--output-schema <file>` | Validates the final response shape. | `codex exec` only. |
+| `--local-provider <provider>` | Selects a local OSS provider. | Current local help lists `lmstudio` and `ollama`. |
 
 ## Environment Variables
 
@@ -234,6 +256,12 @@ git checkout feature-branch
 codex review --base main
 ```
 
+Run a review through `codex exec`:
+
+```bash
+codex exec review --uncommitted --json
+```
+
 Resume previous work:
 
 ```bash
@@ -259,6 +287,32 @@ Reduce context during a long TUI session:
 /compact
 /status
 ```
+
+## Experimental, Legacy, and Version-Dependent Items
+
+| Item | Status | Notes |
+|---|---|---|
+| `codex cloud` | Experimental | Requires Codex Cloud access. |
+| `codex cloud status <TASK_ID>` | Experimental | Shows task status. |
+| `codex cloud diff <TASK_ID>` | Experimental | Shows a unified task diff. |
+| `codex cloud apply <TASK_ID>` | Experimental | Applies a cloud task locally. |
+| `codex app-server` | Experimental | Local development and debugging command. |
+| `codex app-server generate-ts` | Experimental | Generates app-server TypeScript bindings. |
+| `codex app-server generate-json-schema` | Experimental | Generates app-server JSON Schema. |
+| `codex mcp-server` | Experimental | Runs Codex as an MCP server. |
+| `codex sandbox` | Experimental | OS-specific sandbox helpers. |
+| `codex execpolicy` | Preview | Tests execpolicy rules. |
+| `codex debug app-server send-message-v2` | Debug tooling | Sends an app-server protocol message for debugging. |
+| `codex debug models --bundled` | Debug tooling | Lists bundled model definitions. |
+| `codex plugin marketplace` | Experimental | Manages plugin marketplace sources. |
+| `codex cloud-tasks` | Deprecated alias | Prefer `codex cloud`. |
+| `/apps`, `/plugins` | Feature-dependent | Availability depends on installed connectors or plugins. |
+| `/goal` | Version-dependent | Mentioned in `openai/codex` `0.128.0` release notes, but not confirmed here as universally available. |
+| `/approvals` | Legacy alias | Prefer `/permissions`. |
+| `/clean` | Legacy alias | Prefer `/stop`. |
+| `--full-auto` | Compatibility/deprecated depending on docs/version | Prefer explicit `--sandbox` and approval flags. |
+| `--experimental-json` | Alias | Prefer `--json`. |
+| `codex --upgrade` | Older help content | Current docs use `codex update`. |
 
 ## Related Resources
 
