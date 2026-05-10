@@ -2,7 +2,7 @@
 
 A practical command reference for OpenAI Codex CLI. This README separates shell commands, interactive slash commands, CLI flags, configuration keys, environment variables, and experimental features so developers can use each one in the right context.
 
-Codex CLI changes over time. Commands marked experimental, deprecated, or version-dependent should be checked against the official docs or `codex --help` before being used in scripts.
+Codex CLI changes over time. Use the official OpenAI Codex CLI docs as the primary source for command availability. Local `codex --help` output is useful for checking the installed version, but it can lag behind the latest CLI release or differ from Codex Desktop behavior.
 
 ## Quick Start
 
@@ -95,6 +95,7 @@ Slash commands work inside the interactive Codex TUI. They are not shell command
 |---|---|---|
 | `/status` | Shows model, approval policy, sandbox, writable roots, token usage, and session details. | First command to run when diagnosing a session. |
 | `/model` | Changes model and reasoning effort when available. | TUI-only. |
+| `/goal` | Sets or views an experimental goal for a long-running task. | Official slash command. Requires `features.goals`. |
 | `/permissions` | Changes approval behavior during a session. | TUI-only. |
 | `/diff` | Shows current Git diff, including untracked files. | Useful before review or commit. |
 | `/review` | Reviews the current working tree. | Focuses on bugs, regressions, and missing tests. |
@@ -137,6 +138,7 @@ Slash commands work inside the interactive Codex TUI. They are not shell command
 | `codex --oss` | Uses a local open source provider. | Requires local provider setup. |
 | `codex features list` | Lists feature flags and effective state. | Official command. |
 | `codex features enable <feature>` | Enables a feature flag persistently. | Writes to config. |
+| `codex features enable goals` | Enables the experimental goals feature when supported. | Required before `/goal` is available. |
 | `codex features disable <feature>` | Disables a feature flag persistently. | Writes to config. |
 
 Useful config keys:
@@ -288,6 +290,19 @@ Reduce context during a long TUI session:
 /status
 ```
 
+Set a long-running goal:
+
+```bash
+codex features enable goals
+codex
+```
+
+```text
+/goal ship the parser refactor without changing public behavior
+```
+
+Use this when a longer task needs a persistent target that Codex can track across the session.
+
 ## Experimental, Legacy, and Version-Dependent Items
 
 | Item | Status | Notes |
@@ -307,7 +322,7 @@ Reduce context during a long TUI session:
 | `codex plugin marketplace` | Experimental | Manages plugin marketplace sources. |
 | `codex cloud-tasks` | Deprecated alias | Prefer `codex cloud`. |
 | `/apps`, `/plugins` | Feature-dependent | Availability depends on installed connectors or plugins. |
-| `/goal` | Version-dependent | Mentioned in `openai/codex` `0.128.0` release notes, but not confirmed here as universally available. |
+| `/goal` | Experimental | Official slash command. Requires `features.goals`; enable it with `/experimental` or `codex features enable goals`. |
 | `/approvals` | Legacy alias | Prefer `/permissions`. |
 | `/clean` | Legacy alias | Prefer `/stop`. |
 | `--full-auto` | Compatibility/deprecated depending on docs/version | Prefer explicit `--sandbox` and approval flags. |
@@ -321,4 +336,32 @@ Reduce context during a long TUI session:
 - [Codex configuration reference](https://developers.openai.com/codex/config-reference)
 - [Codex authentication](https://developers.openai.com/codex/auth)
 - [OpenAI Codex GitHub repository](https://github.com/openai/codex)
-- [Claude Code Slash Commands Cheatsheet](https://github.com/jqueryscript/Claude-Code-Slash-Commands-Cheatsheet)
+- [Model Context Protocol documentation](https://modelcontextprotocol.io/)
+
+## Suggested Repository Metadata
+
+Recommended repository name:
+
+```text
+codex-commands-cheat-sheet
+```
+
+Recommended GitHub description:
+
+```text
+OpenAI Codex CLI commands cheat sheet for developers: slash commands, flags, config, sandboxing, MCP, and workflows.
+```
+
+Recommended topics:
+
+```text
+codex, openai, codex-cli, cli, developer-tools, cheat-sheet, mcp, ai-coding
+```
+
+## Update Policy
+
+- Verify unstable commands against the official Codex CLI reference.
+- Treat official OpenAI Codex CLI docs as the primary source.
+- Use `codex --help` and subcommand help only as local installed-version checks.
+- Keep shell commands, slash commands, flags, config keys, and environment variables in separate sections.
+- Mark experimental, deprecated, legacy, community, or unverified commands clearly.
