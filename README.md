@@ -1,251 +1,236 @@
 # Codex Commands Cheat Sheet
 
-A practical command reference for OpenAI Codex CLI. This README separates shell commands, interactive slash commands, CLI flags, configuration keys, environment variables, and experimental features so developers can use each one in the right context.
+A practical command reference for OpenAI Codex CLI. This README separates shell commands, interactive slash commands, TUI shortcuts, CLI flags, configuration keys, environment variables, and integration APIs so each item is used in the right place.
 
-Codex CLI changes over time. Use the official OpenAI Codex CLI docs as the primary source for command availability. Local `codex --help` output is useful for checking the installed version, but it can lag behind the latest CLI release or differ from Codex Desktop behavior.
+Last audited: **June 16, 2026**
 
-## Quick Start
+## How to Read This Cheat Sheet
 
-Install Codex CLI:
+Codex has several command surfaces. Use the section that matches where the item is typed.
 
-```bash
-npm install -g @openai/codex
-```
+| Type | Where to use it |
+|---|---|
+| CLI command | Type in your shell, such as `codex exec "Fix failing tests"`. |
+| Slash command | Type inside the interactive Codex TUI, such as `/status`. |
+| TUI shortcut | Type inside the TUI composer, such as `@`. |
+| CLI flag | Add after `codex` or a subcommand, such as `--model`. |
+| Config key | Save in `~/.codex/config.toml`. |
+| Environment variable | Set in the shell before running Codex. |
+| Integration API | Use through app-server or another integration client. |
 
-Sign in:
+## CLI Commands
 
-```bash
-codex login
-```
+Use these from a terminal prompt before or instead of opening the interactive TUI.
 
-Start an interactive session:
+| Command | Use |
+|---|---|
+| `npm install -g @openai/codex` | Install Codex CLI with npm. |
+| `brew install --cask codex` | Install Codex CLI with Homebrew on macOS. |
+| `codex` | Open the interactive TUI in the current project. |
+| `codex "Explain this codebase"` | Open the TUI with an initial prompt. |
+| `codex login` | Start the default ChatGPT sign-in flow. |
+| `codex login --device-auth` | Use device-code auth for headless or remote environments. |
+| `printenv OPENAI_API_KEY \| codex login --with-api-key` | Sign in with an API key from stdin. |
+| `codex login status` | Check the active authentication mode. |
+| `codex logout` | Remove stored Codex credentials. |
+| `codex update` | Apply an update when the installed build supports self-update. |
+| `codex resume` | Open a picker for saved sessions. |
+| `codex resume --last` | Resume the most recent saved session. |
+| `codex resume <SESSION_ID>` | Resume a specific saved session. |
+| `codex fork` | Fork a previous session into a new thread. |
+| `codex archive` | Archive a saved session. |
+| `codex unarchive` | Restore an archived session. |
+| `codex delete` | Permanently delete a saved session after confirmation. |
+| `codex exec "Task"` | Run a non-interactive task. |
+| `codex exec -` | Read the prompt from stdin. |
+| `codex exec resume --last "Task"` | Continue the last non-interactive run. |
+| `codex review` | Run a non-interactive code review. |
+| `codex apply <TASK_ID>` | Apply the latest diff from a Codex Cloud task. |
+| `codex doctor` | Create a local diagnostic report. |
+| `codex app` | Open Codex Desktop from the terminal. |
+| `codex app <PATH>` | Open a workspace path in Codex Desktop. |
+| `codex app --download-url` | Print the Codex Desktop download URL. |
+| `codex completion zsh` | Print shell completions for a supported shell. |
 
-```bash
-codex
-```
+## Cloud, MCP, and Plugin CLI Commands
 
-Run a non-interactive task:
+| Command | Use |
+|---|---|
+| `codex cloud` | Open a Codex Cloud task picker. |
+| `codex cloud list --json` | List recent cloud tasks as JSON. |
+| `codex cloud status <TASK_ID>` | Show a cloud task status. |
+| `codex cloud diff <TASK_ID>` | Show a cloud task diff. |
+| `codex cloud apply <TASK_ID>` | Apply a cloud task diff locally. |
+| `codex mcp list` | List configured MCP servers. |
+| `codex mcp get <name>` | Show one MCP server configuration. |
+| `codex mcp add <name> -- <command...>` | Add a stdio MCP server. |
+| `codex mcp add <name> --url https://...` | Add a streamable HTTP MCP server. |
+| `codex mcp login <name>` | Start OAuth login for an MCP server. |
+| `codex mcp logout <name>` | Remove stored MCP OAuth credentials. |
+| `codex mcp remove <name>` | Delete an MCP server definition. |
+| `codex mcp-server` | Run Codex itself as an MCP server. |
+| `codex plugin list --json` | List installed plugins as JSON. |
+| `codex plugin add --json` | Add a plugin with structured output. |
+| `codex plugin remove --json` | Remove a plugin with structured output. |
+| `codex plugin marketplace list --json` | List marketplace sources as JSON. |
+| `codex plugin marketplace add <source>` | Add a plugin marketplace. |
+| `codex plugin marketplace remove <name>` | Remove a plugin marketplace. |
+| `codex plugin marketplace upgrade [name]` | Refresh Git-backed plugin marketplaces. |
 
-```bash
-codex exec "Review this repository and summarize the highest-risk issues"
-```
+## TUI Shortcuts
 
-Resume the latest session:
+These are typed inside the TUI composer but are not slash commands.
 
-```bash
-codex resume --last
-```
+| Shortcut | Use |
+|---|---|
+| `@` | Open the unified mentions menu for files, plugins, and skills. |
 
-## Command Types
+## Slash Commands
 
-| Type | Used in | Example |
-|---|---|---|
-| CLI command | Shell | `codex exec "Fix failing tests"` |
-| CLI flag | Shell | `codex --model <model>` |
-| Slash command | Interactive Codex TUI | `/status` |
-| Config key | `~/.codex/config.toml` | `sandbox_mode = "workspace-write"` |
-| Environment variable | Shell environment | `CODEX_HOME=~/.codex-dev` |
-| Experimental command | Shell or TUI | `codex mcp-server` |
-| Deprecated or legacy item | Shell or TUI | `--full-auto` |
+Use these only after `codex` opens the interactive TUI.
 
-## Installation and Authentication
+| Slash command | Use |
+|---|---|
+| `/status` | Check model, approval mode, roots, token use, and session details. |
+| `/usage` | View daily, weekly, and cumulative account token activity. |
+| `/new` | Start a new conversation. |
+| `/clear` | Clear the terminal and start fresh. |
+| `/resume` | Open the saved-session picker. |
+| `/fork` | Fork the current conversation. |
+| `/archive` | Archive the current session. |
+| `/delete` | Permanently delete the current session after confirmation. |
+| `/side` | Start a temporary side conversation. |
+| `/compact` | Summarize earlier turns to reduce context use. |
+| `/copy` | Copy the latest completed response. |
+| `/import` | Import selected data from Claude Code. |
+| `/diff` | Show current working tree changes. |
+| `/review` | Review current changes for bugs and regressions. |
+| `/permissions` | Change approval behavior. |
+| `/sandbox-add-read-dir C:\absolute\path` | Grant sandbox read access to another Windows directory. |
+| `/mention src/file.ts` | Attach a file or folder to the conversation. |
+| `/init` | Create an `AGENTS.md` scaffold. |
+| `/model` | Choose model and reasoning effort. |
+| `/fast on`, `/fast off`, `/fast status` | Control Fast mode when supported. |
+| `/plan` | Switch to plan mode. |
+| `/goal` | Set or view a long-running goal. |
+| `/personality` | Change response style when supported. |
+| `/experimental` | Toggle experimental features. |
+| `/mcp` | List MCP tools in the current session. |
+| `/apps` | Browse apps and connectors. |
+| `/plugins` | Browse installed and discoverable plugins. |
+| `/app` | Hand off the current CLI thread to Codex Desktop. |
+| `/statusline` | Configure TUI footer fields. |
+| `/title` | Configure terminal title fields. |
+| `/keymap` | Remap TUI keyboard shortcuts. |
+| `/agent` | Manage delegated agents when available. |
+| `/ps` | List background terminals or running tasks. |
+| `/stop` | Stop a running task. |
+| `/exit` or `/quit` | Exit the TUI. |
+| `/logout` | Sign out from inside the TUI. |
+| `/feedback` | Open the feedback flow. |
+| `/approvals` | Legacy alias. Prefer `/permissions`. |
+| `/clean` | Alias for `/stop`. |
 
-| Command | What it does | Notes |
-|---|---|---|
-| `npm install -g @openai/codex` | Installs Codex CLI with npm. | Official install path. |
-| `brew install --cask codex` | Installs Codex CLI with Homebrew. | Official macOS install path. |
-| `codex login` | Starts the default ChatGPT sign-in flow. | Opens a browser when possible. |
-| `codex login --device-auth` | Uses device-code authentication. | Useful for remote or headless environments. |
-| `printenv OPENAI_API_KEY \| codex login --with-api-key` | Signs in with an API key from stdin. | Keep API keys out of committed files. |
-| `codex login status` | Shows active authentication status. | Exits with status `0` when logged in. |
-| `codex logout` | Removes stored Codex credentials. | Clears stored auth. |
-| `codex update` | Updates Codex when supported by the installed build. | Version-dependent. Current local help may not list it. |
+## CLI Flags
 
-## Session Commands
+Add these to `codex`, `codex exec`, or another subcommand when the command supports them.
 
-| Command | What it does | Notes |
-|---|---|---|
-| `codex` | Starts an interactive session. | Run from the project root. |
-| `codex "Explain this codebase"` | Starts the TUI with an initial prompt. | Useful for analysis sessions. |
-| `codex resume` | Opens a picker for saved sessions. | Scoped to the current directory by default. |
-| `codex resume --last` | Resumes the most recent session. | Add `--all` to ignore directory scope. |
-| `codex resume --include-non-interactive` | Includes non-interactive sessions in the picker and `--last` selection. | Stable in current local CLI help. |
-| `codex resume <SESSION_ID>` | Resumes a specific session. | Session IDs appear in status and session files. |
-| `codex fork` | Forks a previous session. | Useful when trying a different approach. |
-| `codex fork --last` | Forks the latest session. | Keeps the original session intact. |
-| `codex exec resume --last "Continue the fix"` | Resumes a non-interactive session with a follow-up prompt. | Useful for automation. |
-| `codex doctor` | Checks the installed Codex CLI environment. | Use when diagnosing local setup issues. |
+| Flag | Use |
+|---|---|
+| `--add-dir <path>` | Grant access to another directory. |
+| `--ask-for-approval, -a <policy>` | Set approval behavior for one run. |
+| `--cd, -C <path>` | Set the working directory. |
+| `--config, -c key=value` | Override config for one invocation. |
+| `--dangerously-bypass-approvals-and-sandbox` | Disable approvals and sandboxing. |
+| `--yolo` | Alias for bypassing approvals and sandboxing. |
+| `--disable <feature>` | Disable a feature flag for one run. |
+| `--enable <feature>` | Enable a feature flag for one run. |
+| `--image, -i <path>` | Attach an image to the first prompt. |
+| `--help, -h` | Print help. |
+| `--version, -V` | Print the installed CLI version. |
+| `--model, -m <model>` | Override the configured model. |
+| `--no-alt-screen` | Disable alternate-screen TUI mode. |
+| `--oss` | Use a local open source provider. |
+| `--local-provider <provider>` | Select a local OSS provider. |
+| `--profile, -p <name>` | Load a config profile. |
+| `--remote <ws://host:port>` | Connect the TUI to a remote app server. |
+| `--remote-auth-token-env <ENV_VAR>` | Send a bearer token for remote TUI auth. |
+| `--sandbox, -s <mode>` | Set sandbox policy. |
+| `--search` | Enable live web search. |
+| `--json` | Print newline-delimited JSON events for `codex exec`. |
+| `--ephemeral` | Avoid saving session rollout files. |
+| `--skip-git-repo-check` | Run outside a Git repository. |
+| `--ignore-user-config` | Ignore user config for one run. |
+| `--ignore-rules` | Skip user and project execpolicy rules. |
+| `--color never` | Control ANSI color output. |
+| `--output-last-message out.md` | Save the final response to a file. |
+| `--output-schema schema.json` | Validate the final response against a JSON Schema. |
+| `--full-auto` | Deprecated shortcut. Prefer explicit sandbox and approval flags. |
+| `--experimental-json` | Legacy alias for `--json`. |
 
-## Project and Workspace Commands
+## Config Keys
 
-| Command | What it does | Notes |
-|---|---|---|
-| `codex --cd <path>` | Starts Codex in a specific working directory. | Also available as `-C`. |
-| `codex --add-dir <path>` | Grants access to another directory. | Repeatable. Prefer this over disabling the sandbox. |
-| `codex --image screenshot.png "Fix this UI"` | Attaches an image to the initial prompt. | Also available as `-i`. |
-| `codex completion zsh` | Prints shell completions. | Supports `bash`, `zsh`, `fish`, `powershell`, and `elvish`. |
-| `codex app` | Opens Codex Desktop from the terminal. | Listed in current official docs; local CLI behavior may vary by install. |
-| `codex app <PATH>` | Opens a workspace path in Codex Desktop. | Listed in current official docs. |
-| `codex app --download-url` | Prints the Codex Desktop download URL. | Listed in current official docs. |
+Put these in `~/.codex/config.toml` when you want persistent defaults.
 
-## Interactive Slash Commands
-
-Slash commands work inside the interactive Codex TUI. They are not shell commands.
-
-| Command | What it does | Notes |
-|---|---|---|
-| `/status` | Shows model, approval policy, sandbox, writable roots, token usage, and session details. | First command to run when diagnosing a session. |
-| `/model` | Changes model and reasoning effort when available. | TUI-only. |
-| `/ide` | Manages IDE integration when available. | TUI-only and feature-dependent. |
-| `/goal` | Sets or views an experimental goal for a long-running task. | Official slash command. Requires `features.goals`. |
-| `/permissions` | Changes approval behavior during a session. | TUI-only. |
-| `/approve` | Approves a pending action when a session is waiting for approval. | TUI-only. |
-| `/raw` | Sends raw input without Codex command parsing. | TUI-only. |
-| `/diff` | Shows current Git diff, including untracked files. | Useful before review or commit. |
-| `/review` | Reviews the current working tree. | Focuses on bugs, regressions, and missing tests. |
-| `/resume` | Opens a saved-session picker. | TUI equivalent of `codex resume`. |
-| `/new` | Starts a new conversation. | Keeps the CLI open. |
-| `/clear` | Clears the terminal and starts a fresh chat. | Different from only clearing the screen. |
-| `/compact` | Summarizes earlier context to reduce context usage. | Useful during long sessions. |
-| `/mention <path>` | Adds a file or folder to the conversation. | Helps focus Codex on specific code. |
-| `/init` | Generates an `AGENTS.md` scaffold. | Review before committing. |
-| `/mcp` | Lists available MCP tools. | Add `verbose` for more detail. |
-| `/statusline` | Configures TUI footer fields. | Persists to `tui.status_line`. |
-| `/title` | Configures terminal title fields. | Persists to `tui.terminal_title`. |
-| `/keymap` | Remaps TUI keyboard shortcuts. | Persists to `tui.keymap`. |
-| `/theme` | Changes the TUI color theme. | TUI-only. |
-| `/vim` | Toggles Vim keybindings. | TUI-only. |
-| `/memories` | Opens memory management when available. | Feature-dependent. |
-| `/skills` | Opens installed skills when available. | Feature-dependent. |
-| `/hooks` | Opens hook configuration when available. | Feature-dependent. |
-| `/agent` | Creates, switches, lists, or manages delegated agents when available. | Feature-dependent. |
-| `/ps` | Lists background terminals or tasks when available. | Feature-dependent. |
-| `/stop` | Stops running tasks when available. | Feature-dependent. |
-| `/logout` | Signs out of Codex from inside the TUI. | TUI-only. |
-| `/feedback` | Opens feedback flow from inside the TUI. | TUI-only. |
-| `/exit` | Exits Codex. | Alias of `/quit`. |
-
-## Code Editing and Review
-
-| Command | What it does | Notes |
-|---|---|---|
-| `codex exec "Run tests and fix failures"` | Runs Codex non-interactively until the task finishes. | Good for scripted repair tasks. |
-| `codex exec review` | Runs a review through the `codex exec` command tree. | Stable in current local CLI help. |
-| `codex review` | Runs a non-interactive code review. | Stable in current local CLI help. |
-| `codex review --uncommitted` | Reviews staged, unstaged, and untracked changes. | Useful before committing. |
-| `codex review --base main` | Reviews changes against a base branch. | Useful for PR review. |
-| `codex review --commit <SHA>` | Reviews one commit. | Useful for release or regression checks. |
-| `codex review --title "Title"` | Sets an optional title in the review summary. | Stable in current local CLI help. |
-| `codex exec --output-last-message result.md "Summarize the patch"` | Writes the final response to a file. | Good for CI output. |
-| `codex exec --output-schema schema.json "Return JSON"` | Validates final output against a JSON Schema. | Use for structured automation. |
-| `codex apply <TASK_ID>` | Applies the latest diff from a Codex Cloud task. | Requires task access. Alias: `codex a`. |
-
-## Model and Mode Controls
-
-| Command | What it does | Notes |
-|---|---|---|
-| `codex --model <model>` | Overrides the model for one interactive session. | Also available as `-m`. |
-| `codex exec --model <model> "Task"` | Overrides the model for one non-interactive run. | Useful for task-specific model choice. |
-| `codex --profile <name>` | Loads a named config profile. | Also available as `-p`. |
-| `codex --oss` | Uses a local open source provider. | Requires local provider setup. |
-| `codex features list` | Lists feature flags and effective state. | Official command. |
-| `codex features enable <feature>` | Enables a feature flag persistently. | Writes to config. |
-| `codex features enable goals` | Enables the experimental goals feature when supported. | Required before `/goal` is available. |
-| `codex features disable <feature>` | Disables a feature flag persistently. | Writes to config. |
-
-Useful config keys:
-
-```toml
-model = "<model>"
-model_reasoning_effort = "medium"
-model_reasoning_summary = "auto"
-model_verbosity = "medium"
-model_provider = "openai"
-review_model = "<model>"
-```
-
-## Permissions and Sandbox
-
-| Command | What it does | Notes |
-|---|---|---|
-| `codex --sandbox read-only` | Prevents file edits. | Good for audits and explanations. |
-| `codex --sandbox workspace-write` | Allows edits inside the workspace. | Common development mode. |
-| `codex --sandbox danger-full-access` | Disables sandbox restrictions. | Use only in an isolated environment. |
-| `codex --ask-for-approval on-request` | Lets Codex ask when it needs higher-permission action. | Practical interactive default. |
-| `codex --ask-for-approval never` | Prevents approval prompts. | Use with a safe sandbox for automation. |
-| `codex --add-dir <path>` | Grants access to another directory. | Prefer this over disabling the sandbox. |
-| `codex --dangerously-bypass-approvals-and-sandbox` | Runs without approvals or sandboxing. | Dangerous outside a hardened container or VM. |
-| `codex --yolo` | Alias for bypassing approvals and sandboxing. | Same risk as the full bypass flag. |
-| `codex --full-auto` | Runs with low-friction sandboxed automatic execution in builds that support it. | Prefer explicit sandbox and approval flags in new scripts. |
-| `/sandbox-add-read-dir C:\absolute\path` | Grants read access to another directory during a Windows TUI session. | Windows-only slash command. |
-
-Useful config keys:
-
-```toml
-sandbox_mode = "workspace-write"
-approval_policy = "on-request"
-
-[sandbox_workspace_write]
-writable_roots = ["/path/to/extra/workspace"]
-network_access = false
-```
-
-## MCP and Integrations
-
-| Command | What it does | Notes |
-|---|---|---|
-| `codex mcp list` | Lists configured MCP servers. | Add `--json` for machine-readable output. |
-| `codex mcp get <name>` | Shows one MCP server config. | Useful for debugging. |
-| `codex mcp add <name> -- <command...>` | Adds a stdio MCP server. | Command after `--` starts the server. |
-| `codex mcp add <name> --url https://...` | Adds a streamable HTTP MCP server. | Use token env vars for secrets. |
-| `codex mcp login <name>` | Starts OAuth login for an HTTP MCP server. | Server must support OAuth. |
-| `codex mcp login <name> --scopes scope1,scope2` | Requests specific OAuth scopes. | Experimental MCP flow. |
-| `codex mcp logout <name>` | Removes stored OAuth credentials. | HTTP MCP servers only. |
-| `codex mcp remove <name>` | Removes an MCP server definition. | Does not remove external server code. |
-| `codex mcp-server` | Runs Codex as an MCP server over stdio. | Experimental. |
-
-Example:
-
-```bash
-codex mcp add docs -- node ./mcp-docs-server.js
-codex mcp list
-```
-
-## Common CLI Flags
-
-| Flag | What it does | Notes |
-|---|---|---|
-| `--cd, -C <path>` | Sets the working directory. | Use before the task starts. |
-| `--config, -c key=value` | Overrides config for one run. | Values parse as TOML when possible. |
-| `--enable <feature>` | Enables a feature flag for one run. | Repeatable. Equivalent to `-c features.<name>=true`. |
-| `--disable <feature>` | Disables a feature flag for one run. | Repeatable. Equivalent to `-c features.<name>=false`. |
-| `--model, -m <model>` | Overrides the model. | Global flag. |
-| `--profile, -p <name>` | Loads a config profile. | Global flag. |
-| `--sandbox, -s <mode>` | Sets sandbox policy. | `read-only`, `workspace-write`, or `danger-full-access`. |
-| `--ask-for-approval, -a <policy>` | Sets approval behavior. | `untrusted`, `on-request`, or `never`. |
-| `--image, -i <path>` | Attaches images to the initial prompt. | Repeatable. |
-| `--add-dir <path>` | Adds an accessible directory. | Repeatable. |
-| `--search` | Enables live web search. | Uses native web search. |
-| `--no-alt-screen` | Keeps terminal scrollback visible. | Useful in terminal multiplexers. |
-| `--json` | Prints JSONL events in `codex exec`. | Automation-friendly. |
-| `--output-last-message <file>` | Writes the final message to a file. | `codex exec` only. |
-| `--output-schema <file>` | Validates the final response shape. | `codex exec` only. |
-| `--local-provider <provider>` | Selects a local OSS provider. | Current local help lists `lmstudio` and `ollama`. |
-| `--remote <ws://host:port>` | Connects the TUI to a remote app-server endpoint. | Used with remote app-server workflows. |
-| `--remote-auth-token-env <ENV_VAR>` | Sends a bearer token to a remote app-server endpoint. | Requires `--remote`. |
-| `--yolo` | Alias for `--dangerously-bypass-approvals-and-sandbox`. | Dangerous outside a hardened container or VM. |
+| Config key | Use |
+|---|---|
+| `model = "gpt-5.5"` | Set the default model. |
+| `model_reasoning_effort = "medium"` | Set default reasoning effort. |
+| `model_reasoning_summary = "auto"` | Control reasoning summary detail. |
+| `model_verbosity = "medium"` | Set GPT-5 Responses API verbosity. |
+| `model_provider = "openai"` | Select the model provider. |
+| `oss_provider = "ollama"` | Set the provider used by `--oss`. |
+| `review_model = "<model>"` | Set the model used by `/review`. |
+| `sandbox_mode = "workspace-write"` | Persist the sandbox policy. |
+| `sandbox_workspace_write.writable_roots = ["/path"]` | Add writable roots in workspace-write mode. |
+| `sandbox_workspace_write.network_access = true` | Allow outbound network in workspace-write mode. |
+| `approval_policy = "on-request"` | Persist approval behavior. |
+| `history.persistence = "none"` | Stop transcript persistence. |
+| `hide_agent_reasoning = true` | Hide reasoning events in TUI and exec output. |
+| `mcp_servers.<id>.command = "node"` | Define a stdio MCP launcher command. |
+| `mcp_servers.<id>.args = ["server.js"]` | Define stdio MCP launcher arguments. |
+| `mcp_servers.<id>.env = { KEY = "VALUE" }` | Set environment variables for a stdio MCP server. |
+| `mcp_servers.<id>.bearer_token_env_var = "TOKEN_ENV"` | Read an HTTP bearer token from an environment variable. |
+| `mcp_servers.<id>.enabled = false` | Disable a server without deleting it. |
+| `mcp_servers.<id>.enabled_tools = ["tool_name"]` | Allow only selected MCP tools. |
+| `mcp_servers.<id>.disabled_tools = ["tool_name"]` | Block selected MCP tools. |
+| Hooks in `config.toml` | Run lifecycle hooks. |
 
 ## Environment Variables
 
-| Variable | What it does | Notes |
-|---|---|---|
-| `OPENAI_API_KEY` | Provides an OpenAI API key. | Use with `codex login --with-api-key`. |
-| `CODEX_HOME` | Changes Codex config, auth, logs, and session storage. | Defaults to `~/.codex`. |
-| `CODEX_CA_CERTIFICATE` | Points Codex at a custom CA bundle. | Falls back to `SSL_CERT_FILE` when unset. |
-| `SSL_CERT_FILE` | Fallback custom CA path. | Useful behind enterprise TLS inspection. |
-| `RUST_LOG` | Controls Rust logging verbosity. | Useful for debugging. |
-| `CODEX_REMOTE_AUTH_TOKEN` | Example bearer-token variable for remote TUI auth. | Pass the variable name with `--remote-auth-token-env`. |
-| Custom MCP token env vars | Supplies MCP bearer tokens. | Referenced by `bearer_token_env_var`. |
+| Variable | Use |
+|---|---|
+| `OPENAI_API_KEY` | Store an OpenAI API key for API-key auth flows. |
+| `CODEX_API_KEY` | Register remote execution setup for approved OpenAI hosts. |
+| `CODEX_HOME` | Change where Codex stores config, auth, logs, and sessions. |
+| `CODEX_NON_INTERACTIVE=1` | Run supported install scripts without prompts. |
+| `CODEX_CA_CERTIFICATE` | Point Codex at a custom CA bundle. |
+| `SSL_CERT_FILE` | Fallback custom CA bundle path. |
+| `RUST_LOG` | Control Rust logging verbosity. |
+| `CODEX_REMOTE_AUTH_TOKEN` | Example bearer-token variable for remote TUI auth. |
+| Custom provider `env_key` | Supply a provider-specific API key. |
+
+## Experimental CLI Commands
+
+| Command | Use |
+|---|---|
+| `codex app-server` | Run the Codex app server for local integration work. |
+| `codex app-server --stdio` | Launch app-server in stdio mode. |
+| `codex remote-control` | Start or manage a remotely controllable app-server. |
+| `codex execpolicy` | Test execpolicy rules. |
+| `codex sandbox macos -- <COMMAND>` | Run a command under the macOS sandbox helper. |
+| `codex sandbox linux -- <COMMAND>` | Run a command under the Linux sandbox helper. |
+| `codex sandbox windows -- <COMMAND>` | Run a command under the Windows sandbox helper. |
+| `codex sandbox setup --elevated` | Provision supported Windows sandbox requirements. |
+| `codex --upgrade` | Older update command. Prefer `codex update`. |
+| `codex debug seatbelt` | Legacy alias. Prefer `codex sandbox macos`. |
+| `codex debug landlock` | Legacy alias. Prefer `codex sandbox linux`. |
+
+## App Server Integration APIs
+
+| Integration API | Use |
+|---|---|
+| `app-server thread/delete` | Delete a thread through app-server integration. |
 
 ## Real Workflows
 
@@ -321,39 +306,6 @@ codex
 /goal ship the parser refactor without changing public behavior
 ```
 
-Use this when a longer task needs a persistent target that Codex can track across the session.
-
-## Experimental, Legacy, and Version-Dependent Items
-
-| Item | Status | Notes |
-|---|---|---|
-| `codex cloud` | Experimental | Requires Codex Cloud access. |
-| `codex cloud exec --env <ENV_ID> "Task"` | Experimental | Submits a new Codex Cloud task from the shell. |
-| `codex cloud list --json` | Experimental | Lists cloud tasks in machine-readable form. |
-| `codex cloud status <TASK_ID>` | Experimental | Shows task status. |
-| `codex cloud diff <TASK_ID>` | Experimental | Shows a unified task diff. |
-| `codex cloud apply <TASK_ID>` | Experimental | Applies a cloud task locally. |
-| `codex app-server` | Experimental | Local development and debugging command. |
-| `codex app-server generate-ts` | Experimental | Generates app-server TypeScript bindings. |
-| `codex app-server generate-json-schema` | Experimental | Generates app-server JSON Schema. |
-| `codex app-server remote-control` | Experimental | Runs remote-control app-server tooling. |
-| `codex mcp-server` | Experimental | Runs Codex as an MCP server. |
-| `codex sandbox` | Experimental | OS-specific sandbox helpers. |
-| `codex execpolicy` | Preview | Tests execpolicy rules. |
-| `codex debug app-server send-message-v2` | Debug tooling | Sends an app-server protocol message for debugging. |
-| `codex debug models --bundled` | Debug tooling | Lists bundled model definitions. |
-| `codex plugin marketplace` | Experimental | Manages plugin marketplace sources. |
-| `codex cloud-tasks` | Deprecated alias | Prefer `codex cloud`. |
-| `/apps`, `/plugins`, `/skills` | Feature-dependent | Availability depends on installed connectors, plugins, or skills. |
-| `/goal` | Experimental | Official slash command. Requires `features.goals`; enable it with `/experimental` or `codex features enable goals`. |
-| `/approvals` | Legacy alias | Prefer `/permissions`. |
-| `/clean` | Legacy alias | Prefer `/stop`. |
-| `--full-auto` | Compatibility/deprecated depending on docs/version | Prefer explicit `--sandbox` and approval flags. |
-| `--yolo` | Dangerous compatibility alias | Same risk profile as `--dangerously-bypass-approvals-and-sandbox`. |
-| `--experimental-json` | Alias | Prefer `--json`. |
-| `codex --upgrade` | Older help content | Treat as outdated unless `codex --help` for the installed version confirms it. |
-| `codex update` | Version-dependent update command | Use only when the installed build or official docs list it. |
-
 ## Related Resources
 
 - [Codex CLI reference](https://developers.openai.com/codex/cli/reference)
@@ -374,7 +326,7 @@ codex-commands-cheat-sheet
 Recommended GitHub description:
 
 ```text
-OpenAI Codex CLI commands cheat sheet for developers: slash commands, flags, config, sandboxing, MCP, and workflows.
+OpenAI Codex CLI commands cheat sheet for developers: CLI commands, slash commands, flags, config, environment variables, MCP, and workflows.
 ```
 
 Recommended topics:
@@ -385,8 +337,8 @@ codex, openai, codex-cli, cli, developer-tools, cheat-sheet, mcp, ai-coding
 
 ## Update Policy
 
+- Keep CLI commands, slash commands, TUI shortcuts, CLI flags, config keys, environment variables, and integration APIs in separate sections.
 - Verify unstable commands against the official Codex CLI reference.
 - Treat official OpenAI Codex CLI docs as the primary source.
 - Use `codex --help` and subcommand help only as local installed-version checks.
-- Keep shell commands, slash commands, flags, config keys, and environment variables in separate sections.
-- Mark experimental, deprecated, legacy, community, or unverified commands clearly.
+- Mark experimental, deprecated, legacy, community, or unverified items clearly.
