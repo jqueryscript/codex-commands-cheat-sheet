@@ -1,39 +1,8 @@
 # Codex Commands Cheat Sheet
 
-A practical command reference for OpenAI Codex CLI. This README separates shell commands, interactive slash commands, TUI shortcuts, CLI flags, configuration keys, environment variables, and integration APIs so each item is used in the right place.
+OpenAI Codex CLI reference for commands, slash commands, flags, config, environment variables, MCP, and app-server APIs.
 
 Last audited: **August 21, 2026**
-
-Latest stable release checked: **v0.148.0**
-
-## Recent Stable Release Highlights
-
-Stable releases after v0.140.0 added session controls, plugin workflows, remote execution, migration tools, and new integrations. Pre-release builds are excluded from this summary.
-
-| Release | Highlights |
-|---|---|
-| `v0.141.0` | Encrypted Noise relays for remote executors, per-thread executor-plugin MCP servers, and richer app-server thread and rate-limit controls. |
-| `v0.142.0` | Usage-reset credits, categorized plugin discovery and recommendations, rollout token budgets, indexed web search, and configurable multi-agent delegation. |
-| `v0.143.0` | `codex remote-control pair`, remote plugins enabled by default, system proxy support, MCP tool search, and GPT-5.6 Bedrock models. |
-| `v0.144.0–v0.144.6` | Reliability and security fixes for Windows sandboxing, Code Mode, WebSockets, authentication, and review workflows. |
-| `v0.145.0` | Experimental paginated history, expanded `/import` support for Cursor and Claude Code, Bedrock login options, audio and realtime V3, and stronger multi-agent V2 support. |
-| `v0.146.0` | Named `/new` and `/clear` chats, side-chat and paginated-fork improvements, Agent Plugins, remote Code Mode hosts, and custom-provider web search. |
-| `v0.148.0` | `/export`, `codex exec fork`, resume-picker archive and restore, cost estimates in `/status`, built-in Bedrock Runtime, and asynchronous command and MCP hooks. |
-
-## How to Read This Cheat Sheet
-
-Codex has several command surfaces. Use the section that matches where the item is typed.
-
-| Type | Where to use it |
-|---|---|
-| CLI command | Type in your shell, such as `codex exec "Fix failing tests"`. |
-| Slash command | Type inside the interactive Codex TUI, such as `/status`. |
-| TUI shortcut | Type inside the TUI composer, such as `@`. |
-| CLI flag | Add after `codex` or a subcommand, such as `--model`. |
-| Config key | Save in `~/.codex/config.toml`. |
-| Environment variable | Set in the shell before running Codex. |
-| Integration API | Use through app-server or another integration client. |
-
 ## CLI Commands
 
 Use these from a terminal prompt before or instead of opening the interactive TUI.
@@ -255,78 +224,14 @@ Put these in `~/.codex/config.toml` when you want persistent defaults.
 |---|---|
 | `app-server thread/delete` | Delete a thread through app-server integration. |
 
-## Real Workflows
-
-Start a new project:
-
-```bash
-mkdir my-app
-cd my-app
-git init
-codex --sandbox workspace-write --ask-for-approval on-request "Create a small starter app with tests"
-```
-
-Explain an existing repository without edits:
+## Common Examples
 
 ```bash
 codex --sandbox read-only "Explain the architecture and identify the main entry points"
-```
-
-Fix a failing test:
-
-```bash
-codex exec --sandbox workspace-write --ask-for-approval never "Run the relevant tests, fix the failure, and summarize the patch"
-```
-
-Review a pull request locally:
-
-```bash
-git fetch origin
-git checkout feature-branch
+codex exec --sandbox workspace-write --ask-for-approval never "Run the tests and fix the failure"
 codex review --base main
-```
-
-Run a review through `codex exec`:
-
-```bash
-codex exec review --uncommitted --json
-```
-
-Resume previous work:
-
-```bash
 codex resume --last
-```
-
-Run headless and save the final response:
-
-```bash
 codex exec --json --output-last-message codex-result.md "Audit this package and report actionable issues"
-```
-
-Use one extra directory safely:
-
-```bash
-codex --sandbox workspace-write --add-dir ../shared "Update this project and the shared package together"
-```
-
-Reduce context during a long TUI session:
-
-```text
-/status
-/compact
-/status
-```
-
-Set a long-running goal:
-
-```bash
-codex features enable goals
-codex
-```
-
-```text
-/goal ship the parser refactor without changing public behavior
 ```
 
 ## Related Resources
@@ -338,31 +243,3 @@ codex
 - [Codex authentication](https://developers.openai.com/codex/auth)
 - [OpenAI Codex GitHub repository](https://github.com/openai/codex)
 - [Model Context Protocol documentation](https://modelcontextprotocol.io/)
-
-## Suggested Repository Metadata
-
-Recommended repository name:
-
-```text
-codex-commands-cheat-sheet
-```
-
-Recommended GitHub description:
-
-```text
-OpenAI Codex CLI commands cheat sheet for developers: CLI commands, slash commands, flags, config, environment variables, MCP, and workflows.
-```
-
-Recommended topics:
-
-```text
-codex, openai, codex-cli, cli, developer-tools, cheat-sheet, mcp, ai-coding
-```
-
-## Update Policy
-
-- Keep CLI commands, slash commands, TUI shortcuts, CLI flags, config keys, environment variables, and integration APIs in separate sections.
-- Verify unstable commands against the official Codex CLI reference.
-- Treat official OpenAI Codex CLI docs as the primary source.
-- Use `codex --help` and subcommand help only as local installed-version checks.
-- Mark experimental, deprecated, legacy, community, or unverified items clearly.
