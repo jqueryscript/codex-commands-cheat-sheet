@@ -2,7 +2,23 @@
 
 A practical command reference for OpenAI Codex CLI. This README separates shell commands, interactive slash commands, TUI shortcuts, CLI flags, configuration keys, environment variables, and integration APIs so each item is used in the right place.
 
-Last audited: **June 16, 2026**
+Last audited: **August 21, 2026**
+
+Latest stable release checked: **v0.148.0**
+
+## Recent Stable Release Highlights
+
+Stable releases after v0.140.0 added session controls, plugin workflows, remote execution, migration tools, and new integrations. Pre-release builds are excluded from this summary.
+
+| Release | Highlights |
+|---|---|
+| `v0.141.0` | Encrypted Noise relays for remote executors, per-thread executor-plugin MCP servers, and richer app-server thread and rate-limit controls. |
+| `v0.142.0` | Usage-reset credits, categorized plugin discovery and recommendations, rollout token budgets, indexed web search, and configurable multi-agent delegation. |
+| `v0.143.0` | `codex remote-control pair`, remote plugins enabled by default, system proxy support, MCP tool search, and GPT-5.6 Bedrock models. |
+| `v0.144.0–v0.144.6` | Reliability and security fixes for Windows sandboxing, Code Mode, WebSockets, authentication, and review workflows. |
+| `v0.145.0` | Experimental paginated history, expanded `/import` support for Cursor and Claude Code, Bedrock login options, audio and realtime V3, and stronger multi-agent V2 support. |
+| `v0.146.0` | Named `/new` and `/clear` chats, side-chat and paginated-fork improvements, Agent Plugins, remote Code Mode hosts, and custom-provider web search. |
+| `v0.148.0` | `/export`, `codex exec fork`, resume-picker archive and restore, cost estimates in `/status`, built-in Bedrock Runtime, and asynchronous command and MCP hooks. |
 
 ## How to Read This Cheat Sheet
 
@@ -39,28 +55,31 @@ Use these from a terminal prompt before or instead of opening the interactive TU
 | `codex resume <SESSION_ID>` | Resume a specific saved session. |
 | `codex fork` | Fork a previous session into a new thread. |
 | `codex archive` | Archive a saved session. |
+| `codex remote-control pair` | Print a short-lived manual pairing code for a running remote-control daemon. |
 | `codex unarchive` | Restore an archived session. |
 | `codex delete` | Permanently delete a saved session after confirmation. |
 | `codex exec "Task"` | Run a non-interactive task. |
 | `codex exec -` | Read the prompt from stdin. |
 | `codex exec resume --last "Task"` | Continue the last non-interactive run. |
+| `codex exec fork` | Fork a saved non-interactive session into a new session while preserving the original. |
 | `codex review` | Run a non-interactive code review. |
 | `codex apply <TASK_ID>` | Apply the latest diff from a Codex Cloud task. |
 | `codex doctor` | Create a local diagnostic report. |
 | `codex app` | Open Codex Desktop from the terminal. |
-| `codex app <PATH>` | Open a workspace path in Codex Desktop. |
+| `codex app [PATH]` | Launch Codex Desktop. macOS can open a workspace path; Windows prints the path to open. |
 | `codex app --download-url` | Print the Codex Desktop download URL. |
-| `codex completion zsh` | Print shell completions for a supported shell. |
+| `codex completion <shell>` | Print shell completions for Bash, Zsh, Fish, PowerShell, or Elvish. |
 
 ## Cloud, MCP, and Plugin CLI Commands
 
 | Command | Use |
 |---|---|
-| `codex cloud` | Open a Codex Cloud task picker. |
-| `codex cloud list --json` | List recent cloud tasks as JSON. |
-| `codex cloud status <TASK_ID>` | Show a cloud task status. |
-| `codex cloud diff <TASK_ID>` | Show a cloud task diff. |
-| `codex cloud apply <TASK_ID>` | Apply a cloud task diff locally. |
+| `codex cloud` or `codex cloud-tasks` | Open a Codex Cloud task picker. |
+| `codex cloud exec --env <ENV_ID> [--attempts <1-4>] "Task"` | Submit a cloud task directly with an optional retry limit. |
+| `codex cloud list [--limit <N>] [--cursor <CURSOR>] [--env <ENV_ID>] --json` | List recent cloud tasks with JSON output and optional pagination or environment filtering. |
+| `codex cloud status <TASK_ID>` | Legacy syntax. Use the cloud task picker or current cloud task commands. |
+| `codex cloud diff <TASK_ID>` | Legacy syntax. Use the current cloud task workflow to inspect results. |
+| `codex cloud apply <TASK_ID>` | Legacy syntax. Use `codex apply <TASK_ID>` for a task diff when supported. |
 | `codex mcp list` | List configured MCP servers. |
 | `codex mcp get <name>` | Show one MCP server configuration. |
 | `codex mcp add <name> -- <command...>` | Add a stdio MCP server. |
@@ -69,13 +88,13 @@ Use these from a terminal prompt before or instead of opening the interactive TU
 | `codex mcp logout <name>` | Remove stored MCP OAuth credentials. |
 | `codex mcp remove <name>` | Delete an MCP server definition. |
 | `codex mcp-server` | Run Codex itself as an MCP server. |
-| `codex plugin list --json` | List installed plugins as JSON. |
-| `codex plugin add --json` | Add a plugin with structured output. |
+| `codex plugin list [--available] --json` | List installed plugins or include available plugin metadata as JSON. |
+| `codex plugin add <PLUGIN[@MARKETPLACE]> --json` | Add a plugin with structured output. |
 | `codex plugin remove --json` | Remove a plugin with structured output. |
 | `codex plugin marketplace list --json` | List marketplace sources as JSON. |
-| `codex plugin marketplace add <source>` | Add a plugin marketplace. |
-| `codex plugin marketplace remove <name>` | Remove a plugin marketplace. |
-| `codex plugin marketplace upgrade [name]` | Refresh Git-backed plugin marketplaces. |
+| `codex plugin marketplace add <source> [--ref <REF>] [--sparse] --json` | Add a plugin marketplace and optionally return JSON. |
+| `codex plugin marketplace remove <name> --json` | Remove a plugin marketplace. |
+| `codex plugin marketplace upgrade [name] --json` | Refresh Git-backed plugin marketplaces. |
 
 ## TUI Shortcuts
 
@@ -84,6 +103,8 @@ These are typed inside the TUI composer but are not slash commands.
 | Shortcut | Use |
 |---|---|
 | `@` | Open the unified mentions menu for files, plugins, and skills. |
+| `Ctrl+R` | Search prompt history. |
+| `Ctrl+O` | Copy the latest completed output. |
 
 ## Slash Commands
 
@@ -91,18 +112,19 @@ Use these only after `codex` opens the interactive TUI.
 
 | Slash command | Use |
 |---|---|
-| `/status` | Check model, approval mode, roots, token use, and session details. |
-| `/usage` | View daily, weekly, and cumulative account token activity. |
-| `/new` | Start a new conversation. |
-| `/clear` | Clear the terminal and start fresh. |
+| `/status` | Check model, approval mode, roots, token use, cost estimate, and session details. |
+| `/usage` | View token activity, rate limits, and available usage-reset credits. |
+| `/new [NAME]` | Start a new conversation; an optional name helps find it later. |
+| `/clear [NAME]` | Clear the terminal and start a fresh, optionally named chat. |
 | `/resume` | Open the saved-session picker. |
 | `/fork` | Fork the current conversation. |
 | `/archive` | Archive the current session. |
 | `/delete` | Permanently delete the current session after confirmation. |
-| `/side` | Start a temporary side conversation. |
+| `/side` | Start a temporary side chat and return to the parent without closing it. |
 | `/compact` | Summarize earlier turns to reduce context use. |
 | `/copy` | Copy the latest completed response. |
-| `/import` | Import selected data from Claude Code. |
+| `/export` | Export the complete TUI conversation to Markdown, copy it, or save it to a file. |
+| `/import` | Import supported setup, project files, recent chats, and other supported artifacts from Claude Code or Cursor. |
 | `/diff` | Show current working tree changes. |
 | `/review` | Review current changes for bugs and regressions. |
 | `/permissions` | Change approval behavior. |
@@ -117,7 +139,7 @@ Use these only after `codex` opens the interactive TUI.
 | `/experimental` | Toggle experimental features. |
 | `/mcp` | List MCP tools in the current session. |
 | `/apps` | Browse apps and connectors. |
-| `/plugins` | Browse installed and discoverable plugins. |
+| `/plugins` | Browse categorized plugins, recommendations, and installed plugin state. |
 | `/app` | Hand off the current CLI thread to Codex Desktop. |
 | `/statusline` | Configure TUI footer fields. |
 | `/title` | Configure terminal title fields. |
@@ -214,13 +236,14 @@ Put these in `~/.codex/config.toml` when you want persistent defaults.
 
 | Command | Use |
 |---|---|
-| `codex app-server` | Run the Codex app server for local integration work. |
-| `codex app-server --stdio` | Launch app-server in stdio mode. |
-| `codex remote-control` | Start or manage a remotely controllable app-server. |
+| `codex app-server [--stdio|--listen <URL>]` | Start the experimental app-server. Stdio JSONL is the default; use `--listen ws://...` or `--listen unix://...` for other transports. |
+| `codex remote-control pair` | Print a short-lived manual pairing code; add `--json` for machine-readable output. |
+| `codex remote-control` | Start or manage a remotely controllable app-server. Use `codex remote-control pair` for manual pairing. |
 | `codex execpolicy` | Test execpolicy rules. |
 | `codex sandbox macos -- <COMMAND>` | Run a command under the macOS sandbox helper. |
 | `codex sandbox linux -- <COMMAND>` | Run a command under the Linux sandbox helper. |
 | `codex sandbox windows -- <COMMAND>` | Run a command under the Windows sandbox helper. |
+| `codex sandbox ... --permission-profile <NAME>` | Run sandbox commands with a named permissions profile on supported platforms. |
 | `codex sandbox setup --elevated` | Provision supported Windows sandbox requirements. |
 | `codex --upgrade` | Older update command. Prefer `codex update`. |
 | `codex debug seatbelt` | Legacy alias. Prefer `codex sandbox macos`. |
@@ -309,6 +332,7 @@ codex
 ## Related Resources
 
 - [Codex CLI reference](https://developers.openai.com/codex/cli/reference)
+- [Codex CLI releases](https://github.com/openai/codex/releases)
 - [Codex slash commands](https://developers.openai.com/codex/cli/slash-commands)
 - [Codex configuration reference](https://developers.openai.com/codex/config-reference)
 - [Codex authentication](https://developers.openai.com/codex/auth)
